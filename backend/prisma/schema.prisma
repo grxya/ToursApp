@@ -1,0 +1,221 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//////////////////////////////////////////////////////////////////
+
+model User {
+  id String @id @default(uuid()) 
+  username String @unique
+  email String @unique
+  password String
+  refreshToken String?
+  refreshTokenExpiryTime DateTime?
+
+  bookings Booking[]
+  reviews Review[]
+  cartItems CartItem[]
+
+  role Role @relation(fields: [roleId], references: [id])
+  roleId String
+}
+
+model Role {
+  id String @id @default(uuid()) 
+  name String @unique
+
+  users User[]
+}
+
+model Country {
+  id String @id @default(uuid()) 
+
+  name String @unique
+
+  nameAz String @unique
+  nameRu String @unique
+  nameJa String @unique
+
+  description String
+
+  descriptionAz String
+  descriptionRu String
+  descriptionJa String
+
+  currency String
+
+  excursions Excursion[]
+  tours Tour[]
+  customizedTours CustomizedTour[]
+}
+
+model Excursion {
+  id String @id @default(uuid()) 
+
+  name String @unique
+
+  nameAz String @unique
+  nameRu String @unique
+  nameJa String @unique
+
+  description String
+
+  descriptionAz String
+  descriptionRu String
+  descriptionJa String
+
+  duration DateTime?
+  price Decimal @db.Decimal(10, 2)
+
+  country Country @relation(fields: [countryId], references: [id])
+  countryId String
+  
+  cartItems CartItem[]
+  bookingItems BookingItem[]
+
+  tours       ExcursionOnTour[]     
+  customizedTours  ExcursionOnCustomizedTour[] 
+}
+
+model Tour {
+  id String @id @default(uuid()) 
+
+  name String @unique
+
+  nameAz String @unique
+  nameRu String @unique
+  nameJa String @unique
+
+  description String
+
+  descriptionAz String
+  descriptionRu String
+  descriptionJa String
+
+  duration DateTime?
+  price Decimal @db.Decimal(10, 2) 
+
+  country Country @relation(fields: [countryId], references: [id])
+  countryId String
+
+  excursions  ExcursionOnTour[] 
+  customizedTours CustomizedTour[]
+
+  cartItems CartItem[]
+  bookingItems BookingItem[]
+}
+
+model CustomizedTour {
+  id String @id @default(uuid()) 
+  duration DateTime?
+  price Decimal @db.Decimal(10, 2)
+
+  baseTour Tour @relation(fields: [baseTourId], references: [id])
+  baseTourId String
+
+  country Country @relation(fields: [countryId], references: [id])
+  countryId String
+
+  excursions  ExcursionOnCustomizedTour[] 
+  
+  cartItems CartItem[]
+  bookingItems BookingItem[]
+}
+
+model ExcursionOnTour {
+  tour       Tour     @relation(fields: [tourId], references: [id])
+  tourId     String 
+  excursion  Excursion @relation(fields: [excursionId], references: [id])
+  excursionId String 
+
+  @@id([tourId, excursionId])
+}
+
+model ExcursionOnCustomizedTour {
+  tour       CustomizedTour @relation(fields: [tourId], references: [id])
+  tourId     String 
+  excursion  Excursion @relation(fields: [excursionId], references: [id])
+  excursionId String 
+
+  @@id([tourId, excursionId])
+}
+
+model Booking {
+  id String @id @default(uuid()) 
+  status BookingStatus @default(CONFIRMED)
+  paymentType PaymentType @default(PAY_ON_ARRIVAL)
+  createdAt DateTime @default(now())
+  price Decimal @db.Decimal(10, 2)
+
+  reviews Review[]
+
+  user User @relation(fields: [userId], references: [id])
+  userId String
+
+  bookingItems BookingItem[]
+}
+
+model BookingItem {
+  id String @id @default(uuid())
+  quantity Int @default(1)
+  price Decimal @db.Decimal(10, 2)
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+  bookingId String
+
+  tourId           String?
+  tour             Tour? @relation(fields: [tourId], references: [id])
+
+  customizedTourId String?
+  customizedTour   CustomizedTour? @relation(fields: [customizedTourId], references: [id])
+
+  excursionId      String?
+  excursion        Excursion? @relation(fields: [excursionId], references: [id])
+
+}
+
+model CartItem {
+  id String @id @default(uuid())
+  quantity Int @default(1)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  userId String
+
+  tourId           String?
+  tour             Tour? @relation(fields: [tourId], references: [id])
+
+  customizedTourId String?
+  customizedTour   CustomizedTour? @relation(fields: [customizedTourId], references: [id])
+
+  excursionId      String?
+  excursion        Excursion? @relation(fields: [excursionId], references: [id])
+}
+
+model Review {
+  id String @id @default(uuid()) 
+  rating Decimal @db.Decimal(1,0)
+  comment String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  userId String
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+  bookingId String
+}
+
+enum BookingStatus {
+  CONFIRMED  
+  COMPLETED  
+}
+
+enum PaymentType {
+  PAID_ONLINE
+  PAY_ON_ARRIVAL
+}
