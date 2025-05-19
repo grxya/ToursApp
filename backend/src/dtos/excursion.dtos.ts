@@ -57,15 +57,22 @@ const ExcursionParamsSchema = z.object({
     excursionId: z.string().uuid("Invalid UUID"),
 });
 
+const ExcursionCountryParamsSchema = z.object({
+    countryId: z.string().uuid("Invalid UUID"),
+  });
+
 export type AddExcursionDTO = z.infer<typeof AddExcursionSchema>;
 export type RemoveExcursionDTO = z.infer<typeof RemoveExcursionSchema>;
 export type ExcursionId = z.infer<typeof ExcursionParamsSchema>;
+export type ExcursionCountryId = z.infer<typeof ExcursionCountryParamsSchema>;
+
 
 export const { schemas: excursionSchemas, $ref } = buildJsonSchemas(
   {
     AddExcursionSchema,
     RemoveExcursionSchema,
     ExcursionParamsSchema,
+    ExcursionCountryParamsSchema
   },
   { $id: "excursion" }
 );

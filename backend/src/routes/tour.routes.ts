@@ -45,4 +45,14 @@ export async function tourRoutes(server: FastifyInstance) {
     },
     tourController.getAll
   );
+  server.get(
+    "/all/:countryId",
+    {
+      schema: {
+        params: $ref("TourCountryParamsSchema"),
+        tags: ["Tours"],
+      },
+    },
+    tourController.getByCountry
+  );
 }

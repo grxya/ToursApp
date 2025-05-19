@@ -39,12 +39,11 @@ export const authController = {
         path: "/",
         maxAge: 24 * 60 * 60,
       })
-      .status(201)
-      .send(accessInfo);
+      .status(accessInfo.status)
+      .send(accessInfo.body);
   },
 
   async logout(request: FastifyRequest, reply: FastifyReply) {
-
     const token = request.cookies.accessToken;
     const user = await userService.getUserByToken(token);
     await authService.logout(user.id);

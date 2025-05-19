@@ -58,15 +58,22 @@ const TourParamsSchema = z.object({
   tourId: z.string().uuid("Invalid UUID"),
 });
 
+const TourCountryParamsSchema = z.object({
+    countryId: z.string().uuid("Invalid UUID"),
+  });
+
 export type AddTourDTO = z.infer<typeof AddTourSchema>;
 export type RemoveTourDTO = z.infer<typeof RemoveTourSchema>;
 export type TourId = z.infer<typeof TourParamsSchema>;
+export type TourCountryId = z.infer<typeof TourCountryParamsSchema>;
+
 
 export const { schemas: tourSchemas, $ref } = buildJsonSchemas(
   {
     AddTourSchema,
     RemoveTourSchema,
     TourParamsSchema,
+    TourCountryParamsSchema
   },
   { $id: "tour" }
 );

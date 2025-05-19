@@ -45,4 +45,15 @@ export async function excursionRoutes(server: FastifyInstance) {
     },
     excursionController.getAll
   );
+
+    server.get(
+      "/all/:countryId",
+      {
+        schema: {
+          params: $ref("ExcursionCountryParamsSchema"),
+          tags: ["Excursions"],
+        },
+      },
+      excursionController.getByCountry
+    );
 }

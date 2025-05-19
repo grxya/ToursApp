@@ -148,7 +148,11 @@ export const bookingService = {
   },
 
   async getAll() {
-    const all = await prisma.booking.findMany();
+    const all = await prisma.booking.findMany({
+      include: {
+        bookingItems: true,
+      },
+    });
     return { status: 201, body: { all } };
   },
 
@@ -157,6 +161,9 @@ export const bookingService = {
 
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
+      include: {
+        bookingItems: true,
+      },
     });
 
     if (!booking) {
@@ -169,6 +176,9 @@ export const bookingService = {
   async getByUser(userId: string) {
     const bookings = await prisma.booking.findMany({
       where: { userId },
+      include: {
+        bookingItems: true,
+      },
     });
 
     return { status: 201, body: { bookings } };

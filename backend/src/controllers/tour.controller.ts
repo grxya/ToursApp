@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { AddTourDTO, RemoveTourDTO, TourId } from "../dtos/tour.dtos";
+import { AddTourDTO, RemoveTourDTO, TourCountryId, TourId } from "../dtos/tour.dtos";
 import { tourService } from "../services/tour.service";
 
 export const tourController = {
@@ -38,6 +38,17 @@ export const tourController = {
 
   async getAll(request: FastifyRequest, reply: FastifyReply) {
     const result = await tourService.getAll();
+    return reply.status(result.status).send(result.body);
+  },
+
+  async getByCountry(
+    request: FastifyRequest<{
+      Params: TourCountryId;
+    }>,
+    reply: FastifyReply
+  ) {
+    const data = request.params;
+    const result = await tourService.getByCountry(data);
     return reply.status(result.status).send(result.body);
   },
 };

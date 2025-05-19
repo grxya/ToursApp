@@ -1,4 +1,4 @@
-import { AddTourDTO, TourId, RemoveTourDTO } from "../dtos/tour.dtos";
+import { AddTourDTO, TourId, RemoveTourDTO, TourCountryId } from "../dtos/tour.dtos";
 import AppError from "../utils/extensions/appError";
 import prisma from "../utils/prisma";
 
@@ -89,7 +89,11 @@ export const tourService = {
   },
 
   async getAll() {
-    const all = await prisma.tour.findMany();
+    const all = await prisma.tour.findMany({
+      include: {
+        excursions: true,
+      },
+    });
     return { status: 201, body: { all } };
   },
 
@@ -98,6 +102,25 @@ export const tourService = {
 
     const tour = await prisma.tour.findUnique({
       where: { id: tourId },
+      include: {
+        excursions: true,
+      },
+    });
+    if (!tour) {
+      throw new AppError("Tour not found.", 404);
+    }
+
+    return { status: 201, body: { tour } };
+  },
+
+  async getByCountry(data: TourCountryId) {
+    const { countryId } = data;
+
+    const tour = await prisma.tour.findMany({
+      where: { countryId: countryId },
+      include: {
+        excursions: true,
+      },
     });
     if (!tour) {
       throw new AppError("Tour not found.", 404);

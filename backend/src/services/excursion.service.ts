@@ -1,5 +1,6 @@
 import {
   AddExcursionDTO,
+  ExcursionCountryId,
   ExcursionId,
   RemoveExcursionDTO,
 } from "../dtos/excursion.dtos";
@@ -91,5 +92,18 @@ export const excursionService = {
     }
 
     return { status: 201, body: { excursion } };
+  },
+
+  async getByCountry(data: ExcursionCountryId) {
+    const { countryId } = data;
+
+    const tour = await prisma.excursion.findMany({
+      where: { countryId: countryId },
+    });
+    if (!tour) {
+      throw new AppError("Excursion not found.", 404);
+    }
+
+    return { status: 201, body: { tour } };
   },
 };
